@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face-to-Animal Sound Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #556270);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            color: white;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #aaa;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .camera-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 270px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #000;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            will-change: transform;
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        
+        .face-indicator {
+            position: absolute;
+            border: 3px solid #4caf50;
+            border-radius: 50%;
+            display: none;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-off {
+            background: linear-gradient(45deg, #556270, #4a5568);
+        }
+        
+        .animals-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .animal-card {
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .animal-card:hover {
+            background: rgba(70, 70, 70, 0.7);
+            transform: translateY(-3px);
+        }
+        
+        .animal-card.active {
+            background: rgba(255, 126, 95, 0.3);
+            border: 1px solid #ff7e5f;
+            transform: scale(1.05);
+        }
+        
+        .animal-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .animal-name {
+            font-size: 0.8rem;
+        }
+        
+        .detection-status {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ff5252;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.active {
+            background: #4caf50;
+            box-shadow: 0 0 8px #4caf50;
+        }
+        
+        .sound-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .volume-control {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .history {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .history-title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #ff7e5f;
+        }
+        
+        .history-list {
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        
+        .history-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-icon {
+            font-size: 1rem;
+            margin-right: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #aaa;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .cow::before { content: "🐄"; }
+        .lion::before { content: "🦁"; }
+        .dog::before { content: "🐕"; }
+        .cat::before { content: "🐈"; }
+        .bird::before { content: "🐦"; }
+        .frog::before { content: "🐸"; }
+        .monkey::before { content: "🐒"; }
+        .elephant::before { content: "🐘"; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+            
+            .camera-container {
+                height: 200px;
+            }
+        }
+        
+        .camera-placeholder {
+            text-align: center;
+            padding: 15px;
+            color: #aaa;
+        }
+        
+        .camera-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ff7e5f;
+        }
+        
+        .error-message {
+            color: #ff5252;
+            background: rgba(255, 82, 82, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face-to-Animal Sound Generator</h1>
+        <p class="subtitle">Point your face at the camera to hear random animal sounds!</p>
+        
+        <div class="content">
+            <div class="camera-section">
+                <h2><i class="fas fa-camera"></i> Camera Feed</h2>
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="face-indicator" id="faceIndicator"></div>
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Camera is not active</p>
+                        <p>Click "Start Camera" to begin</p>
+                    </div>
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+                
+                <div class="controls">
+                    <button id="startBtn" class="btn">
+                        <i class="fas fa-play"></i> Start Camera
+                    </button>
+                    <button id="stopBtn" class="btn btn-off">
+                        <i class="fas fa-stop"></i> Stop Camera
+                    </button>
+                </div>
+                
+                <div class="detection-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">Camera not active</span>
+                </div>
+            </div>
+            
+            <div class="animals-section">
+                <h2><i class="fas fa-paw"></i> Animal Sounds</h2>
+                <p>When a face is detected, one of these sounds will play:</p>
+                
+                <div class="animals-grid">
+                    <div class="animal-card" data-animal="cow">
+                        <div class="animal-icon cow"></div>
+                        <div class="animal-name">Cow</div>
+                    </div>
+                    <div class="animal-card" data-animal="lion">
+                        <div class="animal-icon lion"></div>
+                        <div class="animal-name">Lion</div>
+                    </div>
+                    <div class="animal-card" data-animal="dog">
+                        <div class="animal-icon dog"></div>
+                        <div class="animal-name">Dog</div>
+                    </div>
+                    <div class="animal-card" data-animal="cat">
+                        <div class="animal-icon cat"></div>
+                        <div class="animal-name">Cat</div>
+                    </div>
+                    <div class="animal-card" data-animal="bird">
+                        <div class="animal-icon bird"></div>
+                        <div class="animal-name">Bird</div>
+                    </div>
+                    <div class="animal-card" data-animal="frog">
+                        <div class="animal-icon frog"></div>
+                        <div class="animal-name">Frog</div>
+                    </div>
+                    <div class="animal-card" data-animal="monkey">
+                        <div class="animal-icon monkey"></div>
+                        <div class="animal-name">Monkey</div>
+                    </div>
+                    <div class="animal-card" data-animal="elephant">
+                        <div class="animal-icon elephant"></div>
+                        <div class="animal-name">Elephant</div>
+                    </div>
+                </div>
+                
+                <div class="sound-controls">
+                    <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume-control" id="volumeControl">
+                </div>
+            </div>
+        </div>
+        
+        <div class="history">
+            <div class="history-title"><i class="fas fa-history"></i> Recent Sounds</div>
+            <div class="history-list" id="historyList">
+                <div class="history-item">No sounds played yet</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Made with ❤️ and useless creativity • Face-to-Animal Sound Generator © 2023
+        </div>
+    </div>
+    
+    <audio id="animalSound"></audio>
+
+    <script>
+        
+        const video = document.getElementById('video');
+        const faceIndicator = document.getElementById('faceIndicator');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const volumeControl = document.getElementById('volumeControl');
+        const historyList = document.getElementById('historyList');
+        const animalSound = document.getElementById('animalSound');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        
+        let stream = null;
+        let detectionActive = false;
+        let faceDetected = false;
+        let lastSoundTime = 0;
+        let lastDetectionTime = 0;
+        const soundCooldown = 5000; 
+        const detectionIntervalMs = 5000; 
+        let detectionInterval = null;
+        
+        
+        const animalSounds = {
+            cow: { name: "Cow", icon: "🐄", sound: "cow.mp3" },
+            lion: { name: "Lion", icon: "🦁", sound: "lion.mp3" },
+            dog: { name: "Dog", icon: "🐕", sound: "dog.mp3" },
+            cat: { name: "Cat", icon: "🐈", sound: "cat.mp3" },
+            bird: { name: "Bird", icon: "🐦", sound: "bird.mp3" },
+            frog: { name: "Frog", icon: "🐸", sound: "frog.mp3" },
+            monkey: { name: "Monkey", icon: "🐒", sound: "monkey.mp3" },
+            elephant: { name: "Elephant", icon: "🐘", sound: "elephant.mp3" }
+        };
+        
+        
+        async function startCamera() {
+            errorMessage.style.display = 'none';
+            
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 480 },
+                        height: { ideal: 360 }
+                    }
+                });
+                
+                video.srcObject = stream;
+                cameraPlaceholder.style.display = 'none';
+                video.style.display = 'block';
+                
+                detectionActive = true;
+                statusIndicator.classList.add('active');
+                statusText.textContent = "Looking for faces...";
+                
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                
+                detectionInterval = requestAnimationFrame(detectFaces);
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                cameraPlaceholder.style.display = 'flex';
+                video.style.display = 'none';
+                statusText.textContent = "Camera access denied";
+                errorMessage.textContent = `Error: ${err.message || 'Camera access denied'}`;
+                errorMessage.style.display = 'block';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        }
+        
+        
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            if (detectionInterval) {
+                cancelAnimationFrame(detectionInterval);
+                detectionInterval = null;
+            }
+            
+            detectionActive = false;
+            faceDetected = false;
+            statusIndicator.classList.remove('active');
+            statusText.textContent = "Camera not active";
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+            cameraPlaceholder.style.display = 'flex';
+            video.style.display = 'none';
+            
+            faceIndicator.style.display = 'none';
+        }
+        
+        
+        function detectFaces(timestamp) {
+            if (!detectionActive) return;
+
+            if (!lastDetectionTime || timestamp - lastDetectionTime >= detectionIntervalMs) {
+                
+                const startTime = performance.now();
+                
+                const detectFace = Math.random() > 0.4;
+
+                if (detectFace !== faceDetected) {
+                    faceDetected = detectFace;
+                    statusText.textContent = detectFace ? "Face detected!" : "Looking for faces...";
+
+                    if (detectFace) {
+                        
+                        const videoRect = video.getBoundingClientRect();
+                        const radius = 60 + Math.random() * 30;
+                        const centerX = videoRect.width / 2 + (Math.random() * 80 - 40);
+                        const centerY = videoRect.height / 2 + (Math.random() * 40 - 20);
+                        
+                        faceIndicator.style.width = `${radius * 2}px`;
+                        faceIndicator.style.height = `${radius * 2}px`;
+                        faceIndicator.style.left = `${centerX - radius}px`;
+                        faceIndicator.style.top = `${centerY - radius}px`;
+                        faceIndicator.style.display = 'block';
+                        
+                        playRandomAnimalSound();
+                        
+                        
+                        setTimeout(() => {
+                            if (faceDetected) faceIndicator.style.display = 'none';
+                        }, 1000);
+                    } else {
+                        faceIndicator.style.display = 'none';
+                    }
+                }
+
+                lastDetectionTime = timestamp;
+                
+                
+                console.log(`Detection took ${performance.now() - startTime}ms`);
+            }
+
+            detectionInterval = requestAnimationFrame(detectFaces);
+        }
+        
+        
+        function playRandomAnimalSound() {
+            const now = Date.now();
+            if (now - lastSoundTime < soundCooldown) return;
+
+            lastSoundTime = now;
+
+            const animals = Object.keys(animalSounds);
+            const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+            const animal = animalSounds[randomAnimal];
+
+            animalSound.volume = volumeControl.value;
+            animalSound.src = animal.sound;
+            animalSound.play().catch(err => {
+                console.error("Error playing sound:", err);
+            });
+
+            addToHistory(animal);
+
+            const animalCards = document.querySelectorAll('.animal-card');
+            animalCards.forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.animal === randomAnimal) {
+                    card.classList.add('active');
+                    setTimeout(() => card.classList.remove('active'), 2000);
+                }
+            });
+        }
+        
+
+        function addToHistory(animal) {
+            const historyItem = document.createElement('div');
+            historyItem.classList.add('history-item');
+            historyItem.innerHTML = `
+                <span class="history-icon">${animal.icon}</span>
+                ${animal.name} sound played at ${new Date().toLocaleTimeString()}
+            `;
+            
+            if (historyList.firstChild.textContent === "No sounds played yet") {
+                historyList.innerHTML = '';
+            }
+            
+            historyList.insertBefore(historyItem, historyList.firstChild);
+            
+            if (historyList.children.length > 10) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+        
+        
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        
+        volumeControl.addEventListener('input', () => {
+            animalSound.volume = volumeControl.value;
+        });
+        
+        
+        stopBtn.disabled = true;
+        video.style.display = 'none';
+        
+        document.querySelectorAll('.animal-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const animal = animalSounds[card.dataset.animal];
+                animalSound.volume = volumeControl.value;
+                animalSound.src = animal.sound;
+                animalSound.play().catch(err => {
+                    console.error("Error playing sound:", err);
+                });
+                addToHistory(animal);
+                card.classList.add('active');
+                setTimeout(() => card.classList.remove('active'), 1000);
+            });
+        });
+    </script>
+</body>
+</html>
