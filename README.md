@@ -34,7 +34,7 @@ For Software:
 
 ### Project Demo
 # Video
-[  ]
+https://github.com/thepavithra/Face-to-Animal-Sound-Generator/blob/main/Untitled%20video%20-%20Made%20with%20Clipchamp.mp4
 
 
 
