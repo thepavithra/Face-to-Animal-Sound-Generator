@@ -26,11 +26,6 @@ For Software:
 
 # Screenshots 
 
-![Screenshot1](img2.png
-)
-
-![Screenshot2]( img3.png
-)
 
 ### Project Demo
 # Video
