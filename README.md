@@ -24,29 +24,18 @@ For Software:
 - [html]
 
 
-# Screenshots (Add at least 3)
-![Screenshot1(img1.png
+# Screenshots 
+
+![Screenshot1](img2.png
 )
-*Add caption explaining what this shows*
 
-![Screenshot2](img2.png
+![Screenshot2]( img3.png
 )
-*Add caption explaining what this shows*
-
-![Screenshot3]( img3.png
-)
-*Add caption explaining what this shows*
-
-
-
-![Final](<img width="1832" height="1133" alt="Screenshot 2025-08-02 054605" src="https://github.com/user-attachments/assets/82e983bb-3c07-4569-aa09-c136f3d108b8" />
-)
-*Explain the final build*
 
 ### Project Demo
 # Video
-[ (    )     ]
-*Explain what the video demonstrates*
+[  ]
+
 
 
 Made with ❤️ at TinkerHub Useless Projects 
