@@ -25,7 +25,7 @@ For Software:
 
 
 # Screenshots (Add at least 3)
-![Screenshot1](<img width="1832" height="1133" alt="Screenshot 2025-08-02 054605" src="https://github.com/user-attachments/assets/98014a97-2906-432b-ae1f-e2b5d46ddc06" />
+![Screenshot1(<img width="1832" height="1133" alt="Screenshot 2025-08-02 054605" src="https://github.com/user-attachments/assets/98014a97-2906-432b-ae1f-e2b5d46ddc06" />
 )
 *Add caption explaining what this shows*
 
