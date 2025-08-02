@@ -24,7 +24,12 @@ For Software:
 - [html]
 
 
-# Screenshots 
+# Screenshots (Add at least 3)
+![Screenshot1](img1.png)
+
+
+![Screenshot2](img2.png)
+
 
 
 ### Project Demo
